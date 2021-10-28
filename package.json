@@ -1,0 +1,17 @@
+{
+  "name": "blog-do-codigo",
+  "version": "1.0.0",
+  "description": "Um blog simples em Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "nodemon --inspect server.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.14",
+    "sqlite3": "^5.0.2"
+  }
+}
