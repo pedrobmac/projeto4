@@ -12,7 +12,15 @@ class InternalServerError extends Error {
   }
 }
 
+class ExpirationError extends Error {
+  constructor(mensagem) {
+    super(mensagem);
+    this.name = 'InternalServerError';
+  }
+}
+
 module.exports = {
   InvalidArgumentError: InvalidArgumentError,
-  InternalServerError: InternalServerError
+  InternalServerError: InternalServerError,
+  ExpirationError: ExpirationError
 };

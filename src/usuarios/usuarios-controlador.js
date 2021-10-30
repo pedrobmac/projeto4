@@ -3,12 +3,13 @@ const { InvalidArgumentError, InternalServerError } = require('../erros');
 const jwt = require("jsonwebtoken")
 
 function criaTokenJWT(usuario){
+  const umaHoraEmMilissegundos = 3600000
   const payload = {
-    id: usuario.id
+    id: usuario.id,
+    expiraEm: Date.now() + umaHoraEmMilissegundos
   }
   const token = jwt.sign(payload, process.env.CHAVE_JWT) //process acessa a variável de ambiente de .env usada como senha forte do token
   return token
-
 }
 
 module.exports = {
