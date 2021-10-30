@@ -12,7 +12,10 @@ module.exports = app => {
   app
     .route('/usuario')
     .post(usuariosControlador.adiciona)
-    .get(usuariosControlador.lista);
+    .get(usuariosControlador.lista)
 
-  app.route('/usuario/:id').delete(usuariosControlador.deleta);
-};
+  app.route('/usuario/:id').delete(
+    passport.authenticate("bearer", { session: false }),
+    usuariosControlador.deleta
+  )
+}
