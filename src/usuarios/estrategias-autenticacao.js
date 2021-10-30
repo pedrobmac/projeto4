@@ -5,6 +5,7 @@ const Usuario = require("./usuarios-modelo")
 const { InvalidArgumentError } = require("../erros")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const denylist = require("../../redis/manipula-deny-list")
 
 function verificaUsuario(usuario) {
     if (!usuario) {
@@ -16,6 +17,13 @@ async function verificaSenha(senha, senhaHash) {
     const senhaValida = await bcrypt.compare(senha, senhaHash)
     if (!senhaValida) {
         throw new InvalidArgumentError("Usuário ou senha inválidos")
+    }
+}
+
+async function verificaTokenNaDenylist(token){
+    const tokenNaDenyList = await denylist.contemToken(token)
+    if(tokenNaDenyList){
+        throw new jwt.JsonWebTokenError("Sessão expirada por logout")
     }
 }
 
@@ -40,9 +48,10 @@ passport.use(
     new BearerStrategy(
         async (token, done) => {
             try {
+                await verificaTokenNaDenylist(token)
                 const payload = jwt.verify(token, process.env.CHAVE_JWT)
                 const usuario = await Usuario.buscaPorId(payload.id)
-                done(null, usuario)
+                done(null, usuario, { token: token })
             } catch (erro) {
                 done(erro)
             }

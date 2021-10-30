@@ -1,12 +1,13 @@
 const Usuario = require('./usuarios-modelo');
 const { InvalidArgumentError, InternalServerError } = require('../erros');
 const jwt = require("jsonwebtoken")
+const denylist = require("../../redis/manipula-deny-list")
 
-function criaTokenJWT(usuario){
+function criaTokenJWT(usuario) {
   const payload = {
     id: usuario.id,
   }
-  const token = jwt.sign(payload, process.env.CHAVE_JWT, {expiresIn: "15m"}) //process acessa a variável de ambiente de .env usada como senha forte do token
+  const token = jwt.sign(payload, process.env.CHAVE_JWT, { expiresIn: "15m" }) //process acessa a variável de ambiente de .env usada como senha forte do token
   return token
 }
 
@@ -39,8 +40,18 @@ module.exports = {
   },
 
   login: (req, res) => {
-    const token = criaTokenJWT(req.user)
-    res.set("Authorization", token)
+    try {
+      const token = criaTokenJWT(req.user)
+      res.set("Authorization", token)
+      res.status(204).send()
+    } catch (erro) {
+      res.status(500).json({ erro: erro.message })
+    }
+  },
+
+  logout: async (req, res) => {
+    const token = req.token
+    await denylist.adicionaToken(token)
     res.status(204).send()
   },
 
