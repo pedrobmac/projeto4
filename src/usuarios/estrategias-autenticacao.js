@@ -20,9 +20,9 @@ async function verificaSenha(senha, senhaHash) {
     }
 }
 
-async function verificaTokenNaDenylist(token){
+async function verificaTokenNaDenylist(token) {
     const tokenNaDenyList = await denylist.contemToken(token)
-    if(tokenNaDenyList){
+    if (tokenNaDenyList) {
         throw new jwt.JsonWebTokenError("Sessão expirada por logout")
     }
 }
@@ -51,7 +51,7 @@ passport.use(
                 await verificaTokenNaDenylist(token)
                 const payload = jwt.verify(token, process.env.CHAVE_JWT)
                 const usuario = await Usuario.buscaPorId(payload.id)
-                done(null, usuario, { token: token })
+                done(null, usuario, { token })
             } catch (erro) {
                 done(erro)
             }

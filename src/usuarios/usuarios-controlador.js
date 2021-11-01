@@ -1,72 +1,75 @@
 const Usuario = require('./usuarios-modelo');
-const { InvalidArgumentError, InternalServerError } = require('../erros');
-const jwt = require("jsonwebtoken")
-const denylist = require("../../redis/manipula-deny-list")
+const { InvalidArgumentError } = require('../erros');
+
+const jwt = require('jsonwebtoken');
+const denylist = require('../../redis/manipula-deny-list');
 
 function criaTokenJWT(usuario) {
   const payload = {
     id: usuario.id,
-  }
-  const token = jwt.sign(payload, process.env.CHAVE_JWT, { expiresIn: "15m" }) //process acessa a variável de ambiente de .env usada como senha forte do token
-  return token
+  };
+
+  const token = jwt.sign(payload, process.env.CHAVE_JWT, { expiresIn: '15m' });
+  return token;
 }
 
 module.exports = {
-  adiciona: async (req, res) => {
+  async adiciona(req, res) {
     const { nome, email, senha } = req.body;
 
     try {
-
       const usuario = new Usuario({
         nome,
         email,
-        senha
       });
-
-      await usuario.adicionaSenha(senha)
-
+      await usuario.adicionaSenha(senha);
       await usuario.adiciona();
 
       res.status(201).json();
     } catch (erro) {
       if (erro instanceof InvalidArgumentError) {
-        res.status(422).json({ erro: erro.message });
-      } else if (erro instanceof InternalServerError) {
-        res.status(500).json({ erro: erro.message });
-      } else {
-        res.status(500).json({ erro: erro.message });
+        return res.status(400).json({ erro: erro.message });
       }
+      res.status(500).json({ erro: erro.message });
     }
   },
 
-  login: (req, res) => {
+  async login(req, res) {
     try {
-      const token = criaTokenJWT(req.user)
-      res.set("Authorization", token)
-      res.status(204).send()
+      const token = criaTokenJWT(req.user);
+      res.set('Authorization', token);
+      res.status(204).json();
     } catch (erro) {
-      res.status(500).json({ erro: erro.message })
+      res.status(500).json({ erro: erro.message });
     }
   },
 
-  logout: async (req, res) => {
-    const token = req.token
-    await denylist.adicionaToken(token)
-    res.status(204).send()
-  },
-
-  lista: async (req, res) => {
-    const usuarios = await Usuario.lista();
-    res.json(usuarios);
-  },
-
-  deleta: async (req, res) => {
-    const usuario = await Usuario.buscaPorId(req.params.id);
+  async logout(req, res) {
     try {
+      const token = req.token;
+      await denylist.adiciona(token);
+      res.status(204).json();
+    } catch (erro) {
+      res.status(500).json({ erro: erro.message });
+    }
+  },
+
+  async lista(req, res) {
+    try {
+      const usuarios = await Usuario.lista();
+      res.json(usuarios);
+    } catch (erro) {
+      res.status(500).json({ erro: erro.message });
+    }
+  },
+
+  async deleta(req, res) {
+    try {
+      const usuario = await Usuario.buscaPorId(req.params.id);
       await usuario.deleta();
-      res.status(200).send();
+      res.status(200).json();
     } catch (erro) {
       res.status(500).json({ erro: erro });
     }
-  }
+  },
 };
