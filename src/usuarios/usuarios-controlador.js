@@ -17,6 +17,7 @@ module.exports = {
       const usuario = new Usuario({
         nome,
         email,
+        emailVerificado: false
       });
       await usuario.adicionaSenha(senha);
       await usuario.adiciona();
@@ -61,6 +62,17 @@ module.exports = {
       res.json(usuarios);
     } catch (erro) {
       res.status(500).json({ erro: erro.message });
+    }
+  },
+
+  async verificaEmail(req, res) {
+    try {
+      // const usuario = await Usuario.buscaPorId(req.params.id)
+      const usuario = req.user
+      await usuario.verificaEmail()
+      res.status(200).json("E-mail verificado")
+    } catch (erro) {
+      res.status(500).json({ erro: erro.message })
     }
   },
 
