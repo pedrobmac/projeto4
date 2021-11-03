@@ -1,10 +1,7 @@
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const { estrategiasAutenticacao } = require("./src/usuarios")
+const express = require('express')
+const app = express()
+const bodyParser = require('body-parser')
 
-app.use(
-  bodyParser.json()
-);
+app.use(bodyParser.json())
 
-module.exports = app;
+module.exports = app
