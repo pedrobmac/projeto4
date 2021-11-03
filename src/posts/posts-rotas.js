@@ -9,8 +9,8 @@ module.exports = app => {
     .route('/post')
     .get(
       [tentarAutenticar,
-      tentarAutorizar("post", "ler")],
-    postsControlador.lista
+        tentarAutorizar("post", "ler")],
+      postsControlador.lista
     )
     .post(
       [middlewaresAutenticacao.bearer,
@@ -26,7 +26,8 @@ module.exports = app => {
     )
     .delete(
       [middlewaresAutenticacao.bearer,
-        autorizacao("post", "remover")],
+        middlewaresAutenticacao.local,
+      autorizacao("post", "remover")],
       postsControlador.remover
     )
 }
