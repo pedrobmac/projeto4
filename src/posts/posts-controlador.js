@@ -2,7 +2,7 @@ const Post = require('./posts-modelo')
 const { InvalidArgumentError } = require('../erros')
 
 module.exports = {
-  async adiciona (req, res) {
+  async adiciona(req, res) {
     try {
       req.body.autor = req.user.id
       const post = new Post(req.body)
@@ -17,9 +17,13 @@ module.exports = {
     }
   },
 
-  async lista (req, res) {
+  async lista(req, res) {
     try {
-      const posts = await Post.listarPorAutor(req.user.id)
+      let posts = await Post.listarTodos()
+
+      if (!req.estaAutenticado) {
+        posts = posts.map(post => ({ titulo: post.titulo, conteudo: post.conteudo }))
+      }
 
       res.json(posts)
     } catch (erro) {
@@ -27,7 +31,7 @@ module.exports = {
     }
   },
 
-  async obterDetalhes (req, res) {
+  async obterDetalhes(req, res) {
     try {
       const post = await Post.buscaPorId(req.params.id, req.user.id)
       res.json(post)
@@ -36,7 +40,7 @@ module.exports = {
     }
   },
 
-  async remover (req, res) {
+  async remover(req, res) {
     try {
       const post = await Post.buscaPorId(req.params.id, req.user.id)
       post.remover()

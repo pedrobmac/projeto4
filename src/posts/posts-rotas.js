@@ -1,13 +1,16 @@
 const postsControlador = require('./posts-controlador')
 const { middlewaresAutenticacao } = require('../usuarios')
 const autorizacao = require('../middlewares/autorizacao')
+const tentarAutenticar = require("../middlewares/tentarAutenticar")
+const tentarAutorizar = require("../middlewares/tentarAutorizar")
 
 module.exports = app => {
   app
     .route('/post')
     .get(
-      middlewaresAutenticacao.bearer,
-      postsControlador.lista
+      [tentarAutenticar,
+      tentarAutorizar("post", "ler")],
+    postsControlador.lista
     )
     .post(
       [middlewaresAutenticacao.bearer,
