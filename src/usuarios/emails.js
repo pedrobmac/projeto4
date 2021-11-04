@@ -42,8 +42,19 @@ class EmailVerificacao extends Email {
     this.to = usuario.email
     this.subject = 'Verificação de e-mail'
     this.text = `Olá! Verifique seu e-mail aqui: ${endereco}`
-    this.html = `<h1>Olá!</h1> Verifique seu e-mail aqui: <a href="${endereco}">${endereco}</a>`
+    this.html = `<h1>Olá!</h1> Verifique seu e-mail <a href="${endereco}">aqui</a>.`
   }
 }
 
-module.exports = { EmailVerificacao }
+class EmailRedefinicaoSenha extends Email {
+  constructor (usuario, token) {
+    super()
+    this.from = '"Blog do Código" <noreply@blogdocodigo.com.br>'
+    this.to = usuario.email
+    this.subject = 'Redefinição de senha'
+    this.text = `Olá! Você pediu para redefinir a senha. Use este token para trocar sua senha: ${token}`
+    this.html = `<h1>Olá!</h1> Você pediu para redefinir a senha. Use este token para trocar sua senha: ${token}`
+  }
+}
+
+module.exports = { EmailVerificacao, EmailRedefinicaoSenha }
